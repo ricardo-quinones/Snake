@@ -1,9 +1,10 @@
-;(function (root){
+;(function (root) {
   var SnakeGame = root.SnakeGame = (root.SnakeGame || {} );
 
-  var Snake = SnakeGame.Snake = function(dir, segments) {
+  var Snake = SnakeGame.Snake = function(dir, segments, board) {
     this.dir = dir;
     this.segments = segments;
+    this.board = board;
   }
 
   Snake.COORDS = {
@@ -13,57 +14,94 @@
     "E": [1, 0]
   };
 
-  Snake.prototype.move = function() {
-    var lastSeg = this.segments.pop();
+  Snake.prototype.nextPos = function() {
     var firstSeg = this.segments[0];
-
-    lastSeg = [firstSeg[0] + Snake.COORDS[this.dir][0],
+    nextPos = [firstSeg[0] + Snake.COORDS[this.dir][0],
       firstSeg[1] + Snake.COORDS[this.dir][1]];
-      this.segments.unshift(lastSeg);
+
+    return nextPos;
+  };
+
+  Snake.prototype.move = function(pos) {
+    var lastSeg = this.segments.pop();
+    lastSeg = pos;
+    this.segments.unshift(lastSeg);
   };
 
   Snake.prototype.turn = function (newDir) {
     this.dir = newDir;
   };
 
-  Snake.newSnake = function(dimX, dimY) {
+  Snake.newSnake = function(dim, board) {
     var segments = [];
-    for (var i = 0; i < 6; i++) {
-      segments.push([(dimX / 2 - 3) + i, dimY / 2])
+    for (var i = 0; i < 12; i++) {
+      segments.push([(dim / 2 - 6) + i, dim / 2])
     };
-    return new Snake("W", segments);
+    return new Snake("W", segments, board);
   }
 
   var Board = SnakeGame.Board = function(size) {
-    this.DIM_X = size;
-    this.DIM_Y = size;
-    this.snake = Snake.newSnake(this.DIM_X, this.DIM_Y);
-    this.apples = [];
-    this.string = "";
+    this.dim = size;
+    this.snake = Snake.newSnake(this.dim, this);
+    this.apple = this.makeApple();
+    this.points = 0;
   }
 
+  Board.prototype.makeApple = function () {
+    var pos = [Math.floor(Math.random() * this.dim),
+               Math.floor(Math.random() * this.dim)];
+
+    var segs = this.snake.segments;
+    if (_.every(segs, function (el) { return !(_.isEqual(el, pos)); })) {
+      return pos.reverse();
+    }
+    else {
+      return Board.makeApple();
+    }
+  };
+
+  Board.prototype.updateApple = function() {
+    this.apple = this.makeApple()
+  };
+
+  Board.prototype.snakeEatsApple = function() {
+    var head = this.snake.segments[0];
+    var apple = this.apple.slice().reverse()
+
+    return (_.isEqual(head, apple));
+  };
+
+  Board.prototype.validMove = function(move) {
+    var segs = _.initial(this.snake.segments);
+    var notHit = _.every(segs, function (el) { return !(_.isEqual(el, move)); });
+
+    var head = _.first(segs);
+    var dim = this.dim;
+    var onBoard = (head[0] < dim && head[0] >= 0 && head[1] < dim && head[1] >= 0 )
+    
+    return notHit && onBoard
+  };
+
   Board.prototype.render = function () {
+    var string = "";
     var that = this;
     var segments = that.snake.segments;
-    for (var y = 0; y < that.DIM_Y; y++) {
-      for (var x = 0; x < that.DIM_X; x++) {
+    for (var y = 0; y < that.dim; y++) {
+      for (var x = 0; x < that.dim; x++) {
         var snakeSeg = false
+        var arr = [x, y]
         segments.forEach(function (segment) {
-          if (segment[0] === x && segment[1] === y) {
-            that.string += "S";
+          if (_.isEqual(segment, arr)) {
+            string += "S";
             snakeSeg = true;
           }
         });
         if (snakeSeg === false) {
-          that.string += ".";
+          string += ".";
         }
       }
-      that.string += "\n";
+      string += "\n";
     }
-    return that.string;
+    return string;
   };
-
-
-
-
 })(this);

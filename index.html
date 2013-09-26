@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
 
+    <h1>Snake</h1>
 
-    <pre id="grid"></pre>
 
-
+    <div id="grid"></div>
 
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="underscore.js"></script>
     <script type="text/javascript" src="snake.js"></script>
+    <script type="text/javascript" src="snake_ui.js"></script>
     <script>
-      $(function () { new SnakeGame.View($("#grid")).start(); });
+      $(function () {new SnakeGame.View($('#grid')).start(); });
     </script>
   </body>
 </html>

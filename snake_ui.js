@@ -2,13 +2,13 @@
   var SnakeGame = root.SnakeGame = (root.SnakeGame || {} );
 
   var View = SnakeGame.View = function ($el) {
-    this.$el = $el;
+    this.$el = $el
 
     this.board = null;
     this.intervalId = null;
   }
 
-  View.STEP = 500
+  View.STEP = 150
 
   View.KEYS = {
     37: "W",
@@ -18,12 +18,49 @@
   }
 
   View.prototype.render = function () {
-    $('#grid').text(this.board.render());
+    // this.$el.html(this.board.render());
+    var view = this
+    var board = view.board
+
+    var cellMatrix = (function () {
+      return _.times(board.dim, function () {
+        return _.times(board.dim, function () {
+          return $("<div class='cell'></div>");
+        });
+      });
+    })()
+
+    _(board.snake.segments).each(function (seg) {
+      cellMatrix[seg[1]][seg[0]].addClass("snake")
+    })
+
+    var apple = this.board.apple;
+
+    cellMatrix[apple[0]][apple[1]].addClass("apple");
+
+    this.$el.empty();
+
+    _(cellMatrix).each(function ($cell) {
+      view.$el.append($cell);
+    });
+
   };
 
   View.prototype.step = function () {
-    this.board.snake.move();
-    this.render();
+    var pos = this.board.snake.nextPos();
+
+    if (this.board.validMove(pos)) {
+      this.board.snake.move(pos)
+      if (this.board.snakeEatsApple()) {
+        console.log("apple was updated!!")
+        this.board.updateApple()
+      }
+      this.render();
+    }
+    else {
+      alert("Game Over.")
+      window.clearInterval(this.intervalId)
+    }
   };
 
   View.prototype.handleKeyEvent = function (event) {
@@ -34,7 +71,7 @@
 
   View.prototype.start = function () {
     var game = this;
-    game.board = new SnakeGame.Board(30);
+    game.board = new SnakeGame.Board(20);
     $(window).on('keydown', game.handleKeyEvent.bind(game));
 
     game.intervalId = window.setInterval(function () {
