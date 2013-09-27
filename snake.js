@@ -23,19 +23,24 @@
   };
 
   Snake.prototype.move = function(pos) {
-    var lastSeg = this.segments.pop();
-    lastSeg = pos;
-    this.segments.unshift(lastSeg);
+    this.segments.unshift(pos);
+    if (!this.board.snakeEatsApple()) {
+      this.segments.pop()
+    };
   };
 
   Snake.prototype.turn = function (newDir) {
     this.dir = newDir;
   };
 
+  Snake.prototype.grow = function () {
+
+  };
+
   Snake.newSnake = function(dim, board) {
     var segments = [];
-    for (var i = 0; i < 12; i++) {
-      segments.push([(dim / 2 - 6) + i, dim / 2])
+    for (var i = 0; i < 3; i++) {
+      segments.push([(dim / 2 - 1) + i, dim / 2])
     };
     return new Snake("W", segments, board);
   }
@@ -48,15 +53,16 @@
   }
 
   Board.prototype.makeApple = function () {
+    var board = this;
     var pos = [Math.floor(Math.random() * this.dim),
                Math.floor(Math.random() * this.dim)];
 
     var segs = this.snake.segments;
     if (_.every(segs, function (el) { return !(_.isEqual(el, pos)); })) {
-      return pos.reverse();
+      return pos;
     }
     else {
-      return Board.makeApple();
+      return board.makeApple();
     }
   };
 
@@ -66,7 +72,7 @@
 
   Board.prototype.snakeEatsApple = function() {
     var head = this.snake.segments[0];
-    var apple = this.apple.slice().reverse()
+    var apple = this.apple.slice()
 
     return (_.isEqual(head, apple));
   };
@@ -78,7 +84,7 @@
     var head = _.first(segs);
     var dim = this.dim;
     var onBoard = (head[0] < dim && head[0] >= 0 && head[1] < dim && head[1] >= 0 )
-    
+
     return notHit && onBoard
   };
 
