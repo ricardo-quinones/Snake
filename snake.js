@@ -29,12 +29,14 @@
     };
   };
 
-  Snake.prototype.turn = function (newDir) {
-    this.dir = newDir;
+  Snake.prototype.isNotOppDir = function(newDir) {
+    thisVecDir = Snake.COORDS[this.dir];
+    newVecDir = Snake.COORDS[newDir];
+    return !(thisVecDir[0] === newVecDir[0] * -1 && thisVecDir[1] === newVecDir[1] * -1);
   };
 
-  Snake.prototype.grow = function () {
-
+  Snake.prototype.turn = function (newDir) {
+    this.dir = newDir;
   };
 
   Snake.newSnake = function(dim, board) {

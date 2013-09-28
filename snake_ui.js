@@ -85,8 +85,9 @@
   };
 
   View.prototype.handleKeyEvent = function (event) {
-    if (event.keyCode in View.KEYS) {
-      this.board.snake.turn(View.KEYS[event.keyCode]);
+    var newDir = View.KEYS[event.keyCode];
+    if (event.keyCode in View.KEYS  && this.board.snake.isNotOppDir(newDir)) {
+      this.board.snake.turn(newDir);
     } else if (event.keyCode === 32){
       this.gamePause();
     };
