@@ -11,14 +11,18 @@
     <div id="grid"></div>
     <div id="pause-game" class="pause"></div>
 
+    <div class="start">Start</div>
+    <div class="play-again">You lost. Play again?
+      <div class="yes">Yes</div>
+      <div class="no">No</div>
+    </div>
+    <div class="thanks">Thanks for playing! Come back soon.</div>
     <div class="score"></div>
 
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="underscore.js"></script>
     <script type="text/javascript" src="snake.js"></script>
     <script type="text/javascript" src="snake_ui.js"></script>
-    <script>
-      $(function () {new SnakeGame.View($('#grid')).start(); });
-    </script>
+    
   </body>
 </html>

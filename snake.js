@@ -79,15 +79,16 @@
     return (_.isEqual(head, apple));
   };
 
+  Board.prototype.onBoard = function(newPos) {
+    var dim = this.dim;
+    return (newPos[0] < dim && newPos[0] >= 0 && newPos[1] < dim && newPos[1] >= 0 )
+  };
+
   Board.prototype.validMove = function(move) {
     var segs = _.initial(this.snake.segments);
     var notHit = _.every(segs, function (el) { return !(_.isEqual(el, move)); });
 
-    var head = _.first(segs);
-    var dim = this.dim;
-    var onBoard = (head[0] < dim && head[0] >= 0 && head[1] < dim && head[1] >= 0 )
-
-    return notHit && onBoard
+    return notHit && this.onBoard(move)
   };
 
   Board.prototype.render = function () {

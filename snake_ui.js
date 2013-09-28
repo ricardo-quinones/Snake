@@ -1,10 +1,10 @@
 ;(function (root) {
   var SnakeGame = root.SnakeGame = (root.SnakeGame || {} );
 
-  var View = SnakeGame.View = function ($el) {
+  var View = SnakeGame.View = function ($el, board) {
     this.$el = $el
 
-    this.board = null;
+    this.board = board;
     this.intervalId = null;
     this.points = 0;
     this.pause = false
@@ -51,7 +51,7 @@
 
     _(board.snake.segments).each(function (seg) {
       cellMatrix[seg[1]][seg[0]].addClass("snake")
-    })
+    });
 
     var apple = this.board.apple;
 
@@ -67,21 +67,22 @@
   };
 
   View.prototype.step = function () {
-    var pos = this.board.snake.nextPos();
-    if (this.board.validMove(pos)) {
-      this.board.snake.move(pos)
+    var game = this;
+    var pos = game.board.snake.nextPos();
+    if (game.board.validMove(pos)) {
+      game.board.snake.move(pos)
 
-      if (this.board.snakeEatsApple()) {
-        this.board.updateApple()
+      if (game.board.snakeEatsApple()) {
+        game.board.updateApple()
 
-        this.points += 10
+        game.points += 10;
       }
-      this.render();
+      game.render();
     }
     else {
-      alert("Game Over.")
-      window.clearInterval(this.intervalId)
-    }
+      window.clearInterval(game.intervalId);
+      $(".play-again").toggle();
+    };
   };
 
   View.prototype.handleKeyEvent = function (event) {
@@ -93,9 +94,14 @@
     };
   };
 
+  View.prototype.resetBoard = function() {
+    this.board = new SnakeGame.Board(20);
+  };
+
   View.prototype.start = function () {
     var game = this;
-    game.board = new SnakeGame.Board(20);
+    game.points = 0;
+    // game.board = new SnakeGame.Board(20);
     $(".pause").text("").fadeOut("fast");
     $(window).on('keydown', game.handleKeyEvent.bind(game));
 
@@ -104,3 +110,25 @@
     }, View.STEP);
   };
 })(this);
+
+$(document).ready(function () {
+  var game = new SnakeGame.View($('#grid'), new SnakeGame.Board(20));
+  game.render();
+  
+  $(".start").on("click", function () {
+    $(".score").toggle();
+    $(".start").toggle();
+    window.setTimeout(function () { game.start() }, 500);
+  })
+
+  $(".yes").on("click", function () {
+    $(".play-again").toggle();
+    game.resetBoard();
+    window.setTimeout(function () { game.start() }, 500);
+  });
+
+  $(".no").on("click", function () {
+    $(".play-again").toggle();
+    $(".thanks").toggle();
+  });
+});

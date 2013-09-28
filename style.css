@@ -11,6 +11,10 @@ body {
   border: 5px solid black;
 }
 
+#grid:after {
+  clear: both;
+}
+
 .pause {
   position: fixed;
   top: 50%;
@@ -24,6 +28,52 @@ body {
 
 }
 
+.play-again {
+  display: none;
+  color: rgb(23, 170, 255);
+  margin: 50px;
+  text-align: center;
+  font-family: 'Monofett', cursive;
+  font-size: 300%;
+}
+
+.start {
+  color: rgb(23, 170, 255);
+  margin: 50px;
+  text-align: center;
+  font-family: 'Monofett', cursive;
+  font-size: 300%;
+  cursor: pointer;
+}
+
+.start:hover {
+  color: rgb(220, 220, 220);
+}
+
+.yes {
+  .play-again;
+  cursor: pointer;
+  display: inline;
+}
+
+.no {
+  .play-again;
+  cursor: pointer;
+  display: inline;
+}
+
+.yes:hover, .no:hover {
+  color: rgb(220, 220, 220);
+}
+
+.thanks {
+  display: none;
+  color: rgb(23, 170, 255);
+  margin: 50px;
+  text-align: center;
+  font-family: 'Monofett', cursive;
+  font-size: 300%;
+}
 
 .cell {
   width: 23px;
@@ -49,6 +99,7 @@ body {
 }
 
 .score {
+  display: none;
   color: rgb(23, 170, 255);
   margin: 50px;
   text-align: center;
