@@ -7,7 +7,9 @@
     this.board = board;
     this.intervalId = null;
     this.points = 0;
-    this.pause = false
+    this.pause = false;
+    this.timeoutId = null;
+    this.lost = false;
   }
 
   View.STEP = 80
@@ -21,14 +23,15 @@
 
   View.prototype.gamePause = function () {
     var game = this;
-    if (game.pause === false) {
+    if (game.pause === false && game.lost === false) {
       game.pause = true;
+      window.clearTimeout(game.timeoutId)
       window.clearInterval(game.intervalId);
       $(".pause").fadeIn("linear").text("\u275A \u275A");
-    } else {
+    } else if (game.lost === false) {
       game.pause = false;
       $(".pause").fadeOut("slow");
-      window.setTimeout(function () {
+      game.timeoutId = window.setTimeout(function () {
         game.intervalId = window.setInterval(function () {
           game.step()
         }, View.STEP)
@@ -68,6 +71,8 @@
 
   View.prototype.step = function () {
     var game = this;
+    console.log(game.intervalId);
+    console.log(game.pause);
     var pos = game.board.snake.nextPos();
     if (game.board.validMove(pos)) {
       game.board.snake.move(pos)
@@ -80,6 +85,7 @@
       game.render();
     }
     else {
+      game.lost = true;
       window.clearInterval(game.intervalId);
       $(".play-again").toggle();
     };
@@ -101,7 +107,6 @@
   View.prototype.start = function () {
     var game = this;
     game.points = 0;
-    // game.board = new SnakeGame.Board(20);
     $(".pause").text("").fadeOut("fast");
     $(window).on('keydown', game.handleKeyEvent.bind(game));
 
@@ -118,13 +123,14 @@ $(document).ready(function () {
   $(".start").on("click", function () {
     $(".score").toggle();
     $(".start").toggle();
-    window.setTimeout(function () { game.start() }, 500);
+    game.start();
   })
 
   $(".yes").on("click", function () {
     $(".play-again").toggle();
-    game.resetBoard();
-    window.setTimeout(function () { game.start() }, 500);
+    window.clearTimeout(game.timeoutId)
+    game = new SnakeGame.View($('#grid'), new SnakeGame.Board(20));
+    game.start();
   });
 
   $(".no").on("click", function () {
