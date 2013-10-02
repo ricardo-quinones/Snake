@@ -7,22 +7,31 @@
 
     <div class="title">Snake</div>
 
+    <div class="high-scores-block">
+      <div class="submit-initials">New High Score
+        Enter Your initials:
+        <input type="text" id="input-initials" maxlength="3">
+      </div>
+      <div class="high-scores-list">High Scores:</div>
+      <div class="background"></div>
+    </div>
+    <div id="grid">
+      <div id="pause-game" class="pause">&#x275A &#x275A</div>
+    </div>
 
-    <div id="grid"></div>
-    <div id="pause-game" class="pause"></div>
 
     <div class="start">Start</div>
-    <div class="play-again">You lost. Play again?
+    <div class="play-again">Play again?
       <div class="yes">Yes</div>
       <div class="no">No</div>
     </div>
-    <div class="thanks">Thanks for playing! Come back soon.</div>
+    <div class="thanks">Thanks for playing!<br>Come back soon.</div>
     <div class="score"></div>
 
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="underscore.js"></script>
     <script type="text/javascript" src="snake.js"></script>
     <script type="text/javascript" src="snake_ui.js"></script>
-    
+
   </body>
 </html>
