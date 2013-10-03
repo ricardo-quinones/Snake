@@ -13,7 +13,7 @@
     this.lost = false;
   };
 
-  View.STEP = 300;
+  View.STEP = 80;
 
   View.KEYS = {
     37: "W",
