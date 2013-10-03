@@ -5,15 +5,15 @@
     this.$el = $el
 
     this.board = board;
+    this.currentView = null;
     this.intervalId = null;
     this.points = 0;
     this.pause = false;
     this.timeoutId = null;
     this.lost = false;
-    this.highScores = [];
   };
 
-  View.STEP = 80;
+  View.STEP = 300;
 
   View.KEYS = {
     37: "W",
@@ -22,17 +22,18 @@
     40: "S"
   };
 
+  View.HIGHSCORES = [];
+
   View.prototype.gamePause = function () {
     var game = this;
-    if (game.pause === false && game.lost === false) {
+    if (!game.pause && !game.lost) {
       game.pause = true;
 
-      window.clearTimeout(game.timeoutId);
       window.clearInterval(game.intervalId);
 
       $(".pause").fadeIn("slow");
     }
-    else if (game.lost === false) {
+    else if (!game.lost) {
       game.pause = false;
 
       $(".pause").fadeOut("slow");
@@ -78,7 +79,10 @@
   View.prototype.step = function () {
     var game = this;
 
+    if (!game.timeoutId) window.clearTimeout(game.timeoutId);
+
     var pos = game.board.snake.nextPos();
+
     if (game.board.validMove(pos)) {
       game.board.snake.move(pos)
 
@@ -91,11 +95,12 @@
     }
     else {
       game.lost = true;
-
       window.clearInterval(game.intervalId);
-      if (game.highScores.length < 5 || game.points > _.last(game.highScores)[1]) {
+
+      if (View.HIGHSCORES.length < 5 || game.points > _.last(View.HIGHSCORES)[1]) {
         $(".high-scores-block").toggle();
         $(".submit-initials").toggle();
+        $("#input-initials").focus()
 
         game.submitInitials();
       }
@@ -121,19 +126,19 @@
   };
 
   View.prototype.updateHighScores = function (initials) {
-    this.highScores.push([initials, this.points])
-    this.highScores = _(this.highScores).sortBy(function (array) {
+    View.HIGHSCORES.push([initials, this.points])
+    View.HIGHSCORES = _(View.HIGHSCORES).sortBy(function (array) {
       return array[1];
     });
 
-    this.highScores.reverse()
-    this.highScores = this.highScores.slice(0, 5)
+    View.HIGHSCORES.reverse()
+    View.HIGHSCORES = View.HIGHSCORES.slice(0, 5)
 
     $highScores = $('.high-scores-list')
     $highScores.find('ul').remove();
 
     $ul = $('<ul>')
-    _(this.highScores).each(function (score, i) {
+    _(View.HIGHSCORES).each(function (score, i) {
       $ul.append($('<li>').text((i + 1) + " " + score[0] + " " + score[1]));
     });
 
@@ -146,20 +151,18 @@
 
   View.prototype.handleKeyEvent = function (event) {
     var newDir = View.KEYS[event.keyCode];
-    if (event.keyCode in View.KEYS  && this.board.snake.isNotOppDir(newDir)) {
-      console.log("down");
+    if (event.keyCode in View.KEYS) {
       this.board.snake.turn(newDir);
     } else if (event.keyCode === 32) {
       this.gamePause();
     };
   };
 
-  View.prototype.resetBoard = function() {
-    this.board = new SnakeGame.Board(20);
-  };
-
   View.prototype.start = function () {
     var game = this;
+    game.lost = false;
+
+    window.clearTimeout(game.timeoutId);
 
     $(window).on('keydown', game.handleKeyEvent.bind(game));
 
@@ -176,23 +179,26 @@ $(document).ready(function () {
   $(".start").on("click", function () {
     $(".score").toggle();
     $(".start").toggle();
-    game.start();
+    game.timeoutId = window.setTimeout(function () {
+      game.start();
+    }, 500);
   })
 
   $(".yes").on("click", function () {
     if (!$('.high-scores-block').is(':hidden')) {
       $('.high-scores-block').toggle();
       $('.high-scores-list').toggle();
-    }
-
+    };
     $(".play-again").toggle();
-    window.clearTimeout(game.timeoutId);
+
     game.points = 0;
-    game.resetBoard();
-    //do this if trying to setTimeout before game start and new game
-    // and its causing weird issues
-    // game = new SnakeGame.View($('#grid'), new SnakeGame.Board(20));
-    game.start();
+
+    game = new SnakeGame.View($('#grid'), new SnakeGame.Board(20));
+    game.render();
+
+    game.timeoutId = window.setTimeout(function () {
+      game.start();
+    }, 500);
   });
 
   $(".no").on("click", function () {

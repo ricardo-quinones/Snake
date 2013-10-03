@@ -6,8 +6,10 @@ body {
 
 ul, li {
   margin: 0;
+  margin-right: 5px;
   list-style-type: none;
-  margin-left: 5px;
+  text-align: center;
+  padding: 0;
 }
 
 #grid {
@@ -34,6 +36,7 @@ ul, li {
   z-index: 2;
   text-align: center;
 }
+
 #input-initials {
   position: absolute;
   width: 150px;
